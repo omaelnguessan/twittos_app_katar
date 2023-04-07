@@ -1,6 +1,26 @@
+export class MessageTooLongError extends Error {}
+
+export class EmptyMessageError extends Error {}
+
 export type Message = {
   id: string;
-  text: string;
+  text: MessageText;
   author: string;
   publishedAt: Date;
 };
+
+export class MessageText {
+  private constructor(readonly value: string) {}
+
+  static of(text: string) {
+    if (text.length > 200) {
+      throw new MessageTooLongError();
+    }
+
+    if (text.trim().length === 0) {
+      throw new EmptyMessageError();
+    }
+
+    return new MessageText(text);
+  }
+}

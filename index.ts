@@ -5,9 +5,12 @@ import {
   PostMessageCommand,
   PostsMessageUseCase,
 } from "./src/post-message.usecase";
-import { InMemoryMessageRepository } from "./src/InMemoryMessageRepository";
 import { FileSystemMessageRepository } from "./src/message.fs";
 import { ViewTimeLineUseCase } from "./src/view-timeline.usecase";
+import {
+  EditMessageCommand,
+  EditMessageUseCase,
+} from "./src/edit-message.usecase";
 
 class RealDateProvider implements DateProvider {
   getNow(): Date {
@@ -25,6 +28,8 @@ const viewTimeLineUseCase = new ViewTimeLineUseCase(
   messageRepository,
   dateProvider
 );
+
+const editMessageUseCase = new EditMessageUseCase(messageRepository);
 
 const program = new Command();
 
@@ -46,6 +51,26 @@ program
         try {
           await postsMessageUseCase.handle(postMessageCommand);
           console.log("message poste");
+          process.exit(0);
+        } catch (error) {
+          console.error(error);
+          process.exit(1);
+        }
+      })
+  )
+  .addCommand(
+    new Command("edit")
+      .argument("<messageId>", "the id message to post")
+      .argument("<message>", "the new message to post")
+      .action(async (messageId, message) => {
+        const editMessageCommand: EditMessageCommand = {
+          messageId: messageId,
+          text: message,
+        };
+
+        try {
+          await editMessageUseCase.handle(editMessageCommand);
+          console.log("message edit");
           process.exit(0);
         } catch (error) {
           console.error(error);

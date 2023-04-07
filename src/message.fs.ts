@@ -13,7 +13,15 @@ export class FileSystemMessageRepository implements MessageRepository {
 
   async save(message: Message): Promise<void> {
     const messages = await this.getMessages();
-    messages.push(message);
+    const existingMessageIndex = messages.findIndex(
+      (msg) => msg.id === message.id
+    );
+
+    if (existingMessageIndex === -1) {
+      messages.push(message);
+    } else {
+      messages[existingMessageIndex] = message;
+    }
 
     return fs.promises.writeFile(this.messagePath, JSON.stringify(messages));
   }
@@ -33,5 +41,9 @@ export class FileSystemMessageRepository implements MessageRepository {
       text: msg.text,
       publishedAt: new Date(msg.publishedAt),
     }));
+  }
+
+  async getById(id: string): Promise<Message> {
+    return (await this.getMessages()).filter((msg) => msg.id === id)[0];
   }
 }
