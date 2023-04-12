@@ -1,17 +1,19 @@
-import { Message } from "./message";
-import { MessageRepository } from "./message.repository";
+import { MessageRepository } from "../application/message.repository";
+import { Message } from "../domaine/message";
 
 export class InMemoryMessageRepository implements MessageRepository {
   getAllOfUser(user: string): Promise<Message[]> {
     return Promise.resolve(
       [...this.messages.values()]
         .filter((mgs) => mgs.author === user)
-        .map((m) => ({
-          id: m.id,
-          author: m.author,
-          text: m.text,
-          publishedAt: m.publishedAt,
-        }))
+        .map((m) =>
+          Message.fromData({
+            id: m.id,
+            author: m.author,
+            text: m.text,
+            publishedAt: m.publishedAt,
+          })
+        )
     );
   }
 
