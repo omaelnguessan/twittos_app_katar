@@ -1,4 +1,4 @@
-import { Message } from "./message";
+import { Message } from "../domaine/message";
 
 export interface MessageRepository {
   save(message: Message): Promise<void>;
